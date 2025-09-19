@@ -1,26 +1,68 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+@theme {
+  /* Main colors */
+  --color-background: #ffffff;
+  --color-foreground: #0f172a;
+  --color-muted: #f1f5f9;
+  --color-muted-foreground: #64748b;
+  --color-border: #e2e8f0;
+  --color-input: #e2e8f0;
+  --color-ring: #006400;
+  
+  /* Primary colors */
+  --color-primary: #006400;
+  --color-primary-foreground: #ffffff;
+  
+  /* Destructive colors */
+  --color-destructive: #FF0000;
+  --color-destructive-foreground: #ffffff;
+  
+  /* Accent colors */
+  --color-accent: #f1f5f9;
+  --color-accent-foreground: #0f172a;
+  
+  /* Green palette */
+  --color-green-600: #16a34a;
+  --color-green-700: #15803d;
+  --color-green-800: #166534;
+  --color-green-100: #dcfce7;
+  --color-green-50: #f0fdf4;
+  
+  /* Red palette */
+  --color-red-600: #dc2626;
+  --color-red-50: #fef2f2;
+  --color-red-100: #fee2e2;
+  --color-red-800: #991b1b;
+  
+  /* Blue palette */
+  --color-blue-50: #eff6ff;
+  --color-blue-100: #dbeafe;
+  --color-blue-800: #1e40af;
+  
+  /* Yellow palette */
+  --color-yellow-50: #fefce8;
+  --color-yellow-200: #fde047;
+  --color-yellow-600: #ca8a04;
+  --color-yellow-700: #a16207;
+  --color-yellow-800: #854d0e;
+  
+  /* Gray palette */
+  --color-gray-100: #f3f4f6;
+  --color-gray-200: #e5e7eb;
+  --color-gray-300: #d1d5db;
+  --color-gray-400: #9ca3af;
+  --color-gray-500: #6b7280;
+  --color-gray-600: #4b5563;
+  --color-gray-800: #1f2937;
+  --color-gray-900: #111827;
+  
+  /* Other colors */
+  --color-purple-500: #a855f7;
+  --color-orange-500: #f97316;
+  --color-blue-500: #3b82f6;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Inter', sans-serif;
 }
