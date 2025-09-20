@@ -23,7 +23,8 @@ interface NavItem {
 }
 
 const adminNavItems: NavItem[] = [
-  { href: "/admin-dashboard", label: "Dashboard", roles: ["Admin", "SuperAdmin"] },
+  { href: "/admin-dashboard", label: "Dashboard", roles: ["Admin"] },
+   { href: "/superadmin-dashboard", label: "Dashboard", roles: ["SuperAdmin"] },
   { href: "/admin-dashboard/business", label: "Entreprise", roles: ["Admin", "SuperAdmin"] },
   { href: "/admin-dashboard/events", label: "Événements", roles: ["Admin", "SuperAdmin"] },
   { href: "/admin-dashboard/categories", label: "Catégories", roles: ["Admin", "SuperAdmin"] },

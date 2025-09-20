@@ -2,7 +2,7 @@ import api from '@/lib/api';
 
 export interface LoginResponse {
   access_token: string;
-  // Note: Backend only returns access_token, user info is in JWT payload
+  refresh_token: string;
 }
 
 export interface LoginData {
@@ -12,22 +12,46 @@ export interface LoginData {
 
 export const authService = {
   async login(credentials: LoginData): Promise<LoginResponse> {
-    console.log('🚀 Making login request to:', api.defaults.baseURL + '/auth/login');
-    console.log('📤 Request payload:', credentials);
-    try {
-      const response = await api.post('/auth/login', credentials);
-      console.log('✅ Login successful:', response.data);
-      return response.data;
-    } catch (error: any) {
-      console.error('❌ Login failed:', error.response?.data || error.message);
-      console.error('❌ Status:', error.response?.status);
-      console.error('❌ Full error:', error);
-      throw error;
+    const response = await api.post('/auth/login', credentials);
+    const { access_token, refresh_token } = response.data;
+    
+    localStorage.setItem('access_token', access_token);
+    localStorage.setItem('refresh_token', refresh_token);
+    
+    return response.data;
+  },
+
+  async logout(): Promise<void> {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+  },
+
+  async refreshToken(): Promise<string> {
+    const refreshToken = localStorage.getItem('refresh_token');
+    if (!refreshToken) {
+      throw new Error('No refresh token available');
     }
+
+    const response = await api.post('/auth/refresh', {
+      refresh_token: refreshToken
+    });
+    
+    const { access_token } = response.data;
+    localStorage.setItem('access_token', access_token);
+    
+    return access_token;
   },
 
   async getProfile() {
     const response = await api.get('/auth/profile');
     return response.data;
   },
+
+  isAuthenticated(): boolean {
+    return !!localStorage.getItem('access_token');
+  },
+
+  getToken(): string | null {
+    return localStorage.getItem('access_token');
+  }
 };

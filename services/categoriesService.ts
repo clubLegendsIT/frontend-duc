@@ -4,7 +4,6 @@ export interface CategoryData {
   id?: string;
   name: string;
   description: string;
-  isActive: boolean;
   itemCount?: number;
   createdAt?: string;
   updatedAt?: string;

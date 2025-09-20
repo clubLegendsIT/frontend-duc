@@ -46,7 +46,7 @@ export default function AdminDashboard() {
           Tableau de bord Admin
         </h1>
         <p className="text-gray-600 mt-2">
-          Bienvenue, {user?.email}. Gérez votre contenu ici.
+          Bienvenue, {user?.name}. Gérez votre contenu ici.
         </p>
       </div>
 

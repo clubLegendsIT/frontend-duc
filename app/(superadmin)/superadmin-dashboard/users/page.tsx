@@ -19,19 +19,22 @@ import { Button } from "@/components/ui/button";
 
 interface User {
   id: string;
+  name: string;
   email: string;
+  phone?: string;
   role: "Admin" | "SuperAdmin";
-  isActive: boolean;
-  lastLogin?: string;
+  status: string;
   createdAt: string;
   updatedAt: string;
 }
 
 interface UserFormData {
+  name: string;
   email: string;
+  phone: string;
   password: string;
   role: "Admin" | "SuperAdmin";
-  isActive: boolean;
+  status: string;
 }
 
 export default function UsersPage() {
@@ -43,10 +46,12 @@ export default function UsersPage() {
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
   const [formData, setFormData] = useState<UserFormData>({
+    name: "",
     email: "",
+    phone: "",
     password: "",
     role: "Admin",
-    isActive: true,
+    status: "Active",
   });
 
   const { toast } = useToast();
@@ -73,10 +78,12 @@ export default function UsersPage() {
   const handleAdd = () => {
     setEditingUser(null);
     setFormData({
+      name: "",
       email: "",
+      phone: "",
       password: "",
       role: "Admin",
-      isActive: true,
+      status: "Active",
     });
     setIsModalOpen(true);
   };
@@ -84,10 +91,12 @@ export default function UsersPage() {
   const handleEdit = (user: User) => {
     setEditingUser(user);
     setFormData({
+      name: user.name,
       email: user.email,
+      phone: user.phone || "",
       password: "", // Password should be empty for editing
       role: user.role,
-      isActive: user.isActive,
+      status: user.status,
     });
     setIsModalOpen(true);
   };
@@ -102,9 +111,11 @@ export default function UsersPage() {
     try {
       if (editingUser) {
         const payload = { 
-          email: formData.email, 
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone || undefined,
           role: formData.role, 
-          isActive: formData.isActive,
+          status: formData.status,
           ...(formData.password && { password: formData.password })
         };
         await usersService.update(editingUser.id, payload);
@@ -176,13 +187,27 @@ export default function UsersPage() {
 
   const columns = [
     {
+      key: 'name' as keyof User,
+      header: 'Nom',
+      render: (value: string) => (
+        <div className="font-medium">{value}</div>
+      ),
+    },
+    {
       key: 'email' as keyof User,
       header: 'Email',
       render: (value: string) => (
         <div className="flex items-center space-x-2">
           <Mail className="h-4 w-4 text-gray-500" />
-          <span className="font-medium">{value}</span>
+          <span>{value}</span>
         </div>
+      ),
+    },
+    {
+      key: 'phone' as keyof User,
+      header: 'Téléphone',
+      render: (value: string | undefined) => (
+        <span className="text-sm">{value || '-'}</span>
       ),
     },
     {
@@ -198,28 +223,18 @@ export default function UsersPage() {
       ),
     },
     {
-      key: 'isActive' as keyof User,
+      key: 'status' as keyof User,
       header: 'Statut',
-      render: (value: boolean) => (
+      render: (value: string) => (
         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-          value 
+          value === 'Active' 
             ? 'bg-green-100 text-green-800' 
-            : 'bg-gray-100 text-gray-800'
+            : value === 'Inactive'
+            ? 'bg-gray-100 text-gray-800'
+            : 'bg-red-100 text-red-800'
         }`}>
-          {value ? 'Actif' : 'Inactif'}
+          {value}
         </span>
-      ),
-    },
-    {
-      key: 'lastLogin' as keyof User,
-      header: 'Dernière connexion',
-      render: (value: string | undefined) => (
-        <div className="flex items-center space-x-2">
-          <Calendar className="h-4 w-4 text-gray-500" />
-          <span className="text-sm">
-            {value ? formatDate(value) : 'Jamais'}
-          </span>
-        </div>
       ),
     },
     {
@@ -289,6 +304,17 @@ export default function UsersPage() {
       >
         <div className="space-y-4">
           <div className="space-y-2">
+            <Label htmlFor="name">Nom complet</Label>
+            <Input
+              id="name"
+              value={formData.name}
+              onChange={(e) => handleInputChange("name", e.target.value)}
+              placeholder="Jean Dupont"
+              required
+            />
+          </div>
+
+          <div className="space-y-2">
             <Label htmlFor="email">Adresse email</Label>
             <Input
               id="email"
@@ -297,6 +323,17 @@ export default function UsersPage() {
               onChange={(e) => handleInputChange("email", e.target.value)}
               placeholder="utilisateur@example.com"
               required
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="phone">Téléphone</Label>
+            <Input
+              id="phone"
+              type="tel"
+              value={formData.phone}
+              onChange={(e) => handleInputChange("phone", e.target.value)}
+              placeholder="05 56 XX XX XX"
             />
           </div>
 
@@ -337,15 +374,18 @@ export default function UsersPage() {
             </div>
           </div>
 
-          <div className="flex items-center space-x-2">
-            <input
-              type="checkbox"
-              id="isActive"
-              checked={formData.isActive}
-              onChange={(e) => handleInputChange("isActive", e.target.checked)}
-              className="rounded border-gray-300"
-            />
-            <Label htmlFor="isActive">Compte actif</Label>
+          <div className="space-y-2">
+            <Label htmlFor="status">Statut du compte</Label>
+            <select
+              id="status"
+              value={formData.status}
+              onChange={(e) => handleInputChange("status", e.target.value)}
+              className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm"
+            >
+              <option value="Active">Actif</option>
+              <option value="Inactive">Inactif</option>
+              <option value="Suspended">Suspendu</option>
+            </select>
           </div>
         </div>
       </FormModal>

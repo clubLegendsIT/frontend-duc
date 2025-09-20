@@ -12,33 +12,47 @@ import { Building2, Save, Phone, MapPin, Clock } from "lucide-react";
 interface BusinessInfo {
   id?: string;
   name: string;
+  logoUrl: string;
+  faviconUrl: string;
   email: string;
   phone: string;
   address: string;
   city: string; // Keep for UI, but won't send to backend
   zipCode: string; // Keep for UI, but won't send to backend
-  openingHours: string; // Will map to 'hours' for backend
   description: string;
+  currency: string;
+  slogan: string;
+  openingHours: string; // Will map to 'hours' for backend
+  urlFacebook: string;
+  urlInstagram: string;
+  urlLinkedin: string;
+  uberEatsUrl: string;
+  googleMapsUrl: string;
 }
 
 export default function BusinessPage() {
   const [businessInfo, setBusinessInfo] = useState<BusinessInfo>({
     name: "",
+    logoUrl: "",
+    faviconUrl: "",
     email: "",
     phone: "",
     address: "",
     city: "",
     zipCode: "",
-    openingHours: "",
     description: "",
+    currency: "EUR",
+    slogan: "",
+    openingHours: "",
+    urlFacebook: "",
+    urlInstagram: "",
+    urlLinkedin: "",
+    uberEatsUrl: "",
+    googleMapsUrl: "",
   });
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const { toast } = useToast();
-
-  useEffect(() => {
-    fetchBusinessInfo();
-  }, [fetchBusinessInfo]);
 
   const fetchBusinessInfo = useCallback(async () => {
     setIsLoading(true);
@@ -50,13 +64,22 @@ export default function BusinessPage() {
         setBusinessInfo({
           id: business.id,
           name: business.name || "",
+          logoUrl: business.logoUrl || "",
+          faviconUrl: business.faviconUrl || "",
           email: business.email || "",
           phone: business.phone || "",
           address: business.address || "",
           city: "", // Not provided by backend
           zipCode: "", // Not provided by backend
-          openingHours: business.hours || "", // Map hours to openingHours
           description: business.description || "",
+          currency: business.currency || "EUR",
+          slogan: business.slogan || "",
+          openingHours: business.hours || "", // Map hours to openingHours
+          urlFacebook: business.urlFacebook || "",
+          urlInstagram: business.urlInstagram || "",
+          urlLinkedin: business.urlLinkedin || "",
+          uberEatsUrl: business.uberEatsUrl || "",
+          googleMapsUrl: business.googleMapsUrl || "",
         });
       }
     } catch (error: unknown) {
@@ -73,6 +96,10 @@ export default function BusinessPage() {
     }
   }, [toast]);
 
+  useEffect(() => {
+    fetchBusinessInfo();
+  }, [fetchBusinessInfo]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
@@ -81,11 +108,20 @@ export default function BusinessPage() {
       // Map frontend data to backend format
       const backendData = {
         name: businessInfo.name,
+        logoUrl: businessInfo.logoUrl || undefined,
+        faviconUrl: businessInfo.faviconUrl || undefined,
         email: businessInfo.email || undefined,
         phone: businessInfo.phone || undefined,
         address: businessInfo.address || undefined,
         description: businessInfo.description || undefined,
+        currency: businessInfo.currency,
+        slogan: businessInfo.slogan || undefined,
         hours: businessInfo.openingHours || undefined, // Map openingHours to hours
+        urlFacebook: businessInfo.urlFacebook || undefined,
+        urlInstagram: businessInfo.urlInstagram || undefined,
+        urlLinkedin: businessInfo.urlLinkedin || undefined,
+        uberEatsUrl: businessInfo.uberEatsUrl || undefined,
+        googleMapsUrl: businessInfo.googleMapsUrl || undefined,
         // Note: city and zipCode are not sent to backend as they're not in the DTO
       };
 
@@ -144,6 +180,63 @@ export default function BusinessPage() {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Branding */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Building2 className="h-5 w-5" />
+                <span>Image de Marque</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="logoUrl">Logo (URL)</Label>
+                <Input
+                  id="logoUrl"
+                  type="url"
+                  value={businessInfo.logoUrl}
+                  onChange={(e) => handleInputChange("logoUrl", e.target.value)}
+                  placeholder="https://exemple.com/logo.png"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="faviconUrl">Favicon (URL)</Label>
+                <Input
+                  id="faviconUrl"
+                  type="url"
+                  value={businessInfo.faviconUrl}
+                  onChange={(e) => handleInputChange("faviconUrl", e.target.value)}
+                  placeholder="https://exemple.com/favicon.ico"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="slogan">Slogan</Label>
+                <Input
+                  id="slogan"
+                  value={businessInfo.slogan}
+                  onChange={(e) => handleInputChange("slogan", e.target.value)}
+                  placeholder="Votre slogan accrocheur"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="currency">Devise</Label>
+                <select
+                  id="currency"
+                  value={businessInfo.currency}
+                  onChange={(e) => handleInputChange("currency", e.target.value)}
+                  className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm"
+                >
+                  <option value="EUR">EUR (€)</option>
+                  <option value="USD">USD ($)</option>
+                  <option value="GBP">GBP (£)</option>
+                </select>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Basic Information */}
           <Card>
             <CardHeader>
@@ -208,18 +301,6 @@ export default function BusinessPage() {
                   required
                 />
               </div>
-            </CardContent>
-          </Card>
-
-          {/* Address Information */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <MapPin className="h-5 w-5" />
-                <span>Adresse</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="address">Adresse</Label>
                 <Input
@@ -229,30 +310,6 @@ export default function BusinessPage() {
                   placeholder="123 Rue de la Pizza"
                   required
                 />
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="city">Ville</Label>
-                  <Input
-                    id="city"
-                    value={businessInfo.city}
-                    onChange={(e) => handleInputChange("city", e.target.value)}
-                    placeholder="Podensac"
-                    required
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="zipCode">Code Postal</Label>
-                  <Input
-                    id="zipCode"
-                    value={businessInfo.zipCode}
-                    onChange={(e) => handleInputChange("zipCode", e.target.value)}
-                    placeholder="33720"
-                    required
-                  />
-                </div>
               </div>
             </CardContent>
           </Card>
@@ -275,6 +332,71 @@ export default function BusinessPage() {
                   onChange={(e) => handleInputChange("openingHours", e.target.value)}
                   placeholder="Lun-Ven: 11h30-14h00, 18h00-22h00&#10;Sam-Dim: 18h00-22h00"
                 />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Social Media & Online Presence */}
+          <Card className="lg:col-span-2">
+            <CardHeader>
+              <CardTitle>Présence en Ligne</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="urlFacebook">Facebook</Label>
+                  <Input
+                    id="urlFacebook"
+                    type="url"
+                    value={businessInfo.urlFacebook}
+                    onChange={(e) => handleInputChange("urlFacebook", e.target.value)}
+                    placeholder="https://facebook.com/votrepage"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="urlInstagram">Instagram</Label>
+                  <Input
+                    id="urlInstagram"
+                    type="url"
+                    value={businessInfo.urlInstagram}
+                    onChange={(e) => handleInputChange("urlInstagram", e.target.value)}
+                    placeholder="https://instagram.com/votrepage"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="urlLinkedin">LinkedIn</Label>
+                  <Input
+                    id="urlLinkedin"
+                    type="url"
+                    value={businessInfo.urlLinkedin}
+                    onChange={(e) => handleInputChange("urlLinkedin", e.target.value)}
+                    placeholder="https://linkedin.com/company/votrepage"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="uberEatsUrl">Uber Eats</Label>
+                  <Input
+                    id="uberEatsUrl"
+                    type="url"
+                    value={businessInfo.uberEatsUrl}
+                    onChange={(e) => handleInputChange("uberEatsUrl", e.target.value)}
+                    placeholder="https://ubereats.com/restaurant"
+                  />
+                </div>
+                
+                <div className="md:col-span-2 space-y-2">
+                  <Label htmlFor="googleMapsUrl">Google Maps</Label>
+                  <Input
+                    id="googleMapsUrl"
+                    type="url"
+                    value={businessInfo.googleMapsUrl}
+                    onChange={(e) => handleInputChange("googleMapsUrl", e.target.value)}
+                    placeholder="https://maps.google.com/votre-localisation"
+                  />
+                </div>
               </div>
             </CardContent>
           </Card>

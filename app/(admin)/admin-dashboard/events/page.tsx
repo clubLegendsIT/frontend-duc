@@ -19,23 +19,23 @@ import { Button } from "@/components/ui/button";
 
 interface Event {
   id: string;
-  title: string;
+  name: string;
   description: string;
+  imageUrl?: string;
   startDate: string;
   endDate: string;
-  location: string;
-  isActive: boolean;
+  status: string;
   createdAt: string;
   updatedAt: string;
 }
 
 interface EventFormData {
-  title: string;
+  name: string;
   description: string;
+  imageUrl: string;
   startDate: string;
   endDate: string;
-  location: string;
-  isActive: boolean;
+  status: string;
 }
 
 export default function EventsPage() {
@@ -47,19 +47,15 @@ export default function EventsPage() {
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
   const [eventToDelete, setEventToDelete] = useState<Event | null>(null);
   const [formData, setFormData] = useState<EventFormData>({
-    title: "",
+    name: "",
     description: "",
+    imageUrl: "",
     startDate: "",
     endDate: "",
-    location: "",
-    isActive: true,
+    status: "En cours",
   });
 
   const { toast } = useToast();
-
-  useEffect(() => {
-    fetchEvents();
-  }, [fetchEvents]);
 
   const fetchEvents = useCallback(async () => {
     try {
@@ -76,15 +72,19 @@ export default function EventsPage() {
     }
   }, [toast]);
 
+  useEffect(() => {
+    fetchEvents();
+  }, [fetchEvents]);
+
   const handleAdd = () => {
     setEditingEvent(null);
     setFormData({
-      title: "",
+      name: "",
       description: "",
+      imageUrl: "",
       startDate: "",
       endDate: "",
-      location: "",
-      isActive: true,
+      status: "En cours",
     });
     setIsModalOpen(true);
   };
@@ -92,12 +92,12 @@ export default function EventsPage() {
   const handleEdit = (event: Event) => {
     setEditingEvent(event);
     setFormData({
-      title: event.title,
+      name: event.name,
       description: event.description,
-      startDate: event.startDate.split('T')[0], // Format for date input
-      endDate: event.endDate.split('T')[0],
-      location: event.location,
-      isActive: event.isActive,
+      imageUrl: event.imageUrl || "",
+      startDate: event.startDate ? event.startDate.split('T')[0] : "", // Format for date input
+      endDate: event.endDate ? event.endDate.split('T')[0] : "",
+      status: event.status,
     });
     setIsModalOpen(true);
   };
@@ -110,14 +110,20 @@ export default function EventsPage() {
   const handleSubmit = async () => {
     setIsSaving(true);
     try {
+      const payload = {
+        ...formData,
+        startDate: formData.startDate ? new Date(formData.startDate + 'T00:00:00.000Z').toISOString() : undefined,
+        endDate: formData.endDate ? new Date(formData.endDate + 'T23:59:59.999Z').toISOString() : undefined,
+      };
+
       if (editingEvent) {
-        await eventsService.update(editingEvent.id, formData);
+        await eventsService.update(editingEvent.id, payload);
         toast({
           title: "Succès",
           description: "Événement mis à jour avec succès",
         });
       } else {
-        await eventsService.create(formData);
+        await eventsService.create(payload);
         toast({
           title: "Succès", 
           description: "Événement créé avec succès",
@@ -172,52 +178,57 @@ export default function EventsPage() {
 
   const columns = [
     {
-      key: 'title' as keyof Event,
-      header: 'Titre',
-      render: (value: string) => (
-        <div className="font-medium">{value}</div>
+      key: 'name' as keyof Event,
+      header: 'Nom',
+      render: (value: unknown, item: Event) => (
+        <div className="flex items-center space-x-3">
+          {item.imageUrl ? (
+            <img 
+              src={item.imageUrl} 
+              alt={item.name}
+              className="w-10 h-10 rounded-lg object-cover"
+            />
+          ) : (
+            <div className="w-10 h-10 bg-gray-200 rounded-lg flex items-center justify-center">
+              <Calendar className="h-5 w-5 text-gray-400" />
+            </div>
+          )}
+          <div className="font-medium">{item.name}</div>
+        </div>
       ),
     },
     {
       key: 'startDate' as keyof Event,
       header: 'Date de début',
-      render: (value: string) => (
+      render: (value: unknown, item: Event) => (
         <div className="flex items-center space-x-2">
           <Calendar className="h-4 w-4 text-gray-500" />
-          <span>{formatDate(value)}</span>
+          <span>{formatDate(item.startDate)}</span>
         </div>
       ),
     },
     {
       key: 'endDate' as keyof Event,
       header: 'Date de fin',
-      render: (value: string) => (
+      render: (value: unknown, item: Event) => (
         <div className="flex items-center space-x-2">
           <CalendarDays className="h-4 w-4 text-gray-500" />
-          <span>{formatDate(value)}</span>
+          <span>{formatDate(item.endDate)}</span>
         </div>
       ),
     },
     {
-      key: 'location' as keyof Event,
-      header: 'Lieu',
-      render: (value: string) => (
-        <div className="flex items-center space-x-2">
-          <MapPin className="h-4 w-4 text-gray-500" />
-          <span>{value}</span>
-        </div>
-      ),
-    },
-    {
-      key: 'isActive' as keyof Event,
+      key: 'status' as keyof Event,
       header: 'Statut',
-      render: (value: boolean) => (
+      render: (value: unknown, item: Event) => (
         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-          value 
+          item.status === 'En cours' 
             ? 'bg-green-100 text-green-800' 
-            : 'bg-gray-100 text-gray-800'
+            : item.status === 'Terminé'
+            ? 'bg-gray-100 text-gray-800'
+            : 'bg-red-100 text-red-800'
         }`}>
-          {value ? 'Actif' : 'Inactif'}
+          {item.status}
         </span>
       ),
     },
@@ -267,13 +278,24 @@ export default function EventsPage() {
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="md:col-span-2 space-y-2">
-            <Label htmlFor="title">Titre</Label>
+            <Label htmlFor="name">Nom de l'événement</Label>
             <Input
-              id="title"
-              value={formData.title}
-              onChange={(e) => handleInputChange("title", e.target.value)}
-              placeholder="Titre de l'événement"
+              id="name"
+              value={formData.name}
+              onChange={(e) => handleInputChange("name", e.target.value)}
+              placeholder="Nom de l'événement"
               required
+            />
+          </div>
+
+          <div className="md:col-span-2 space-y-2">
+            <Label htmlFor="imageUrl">Image (URL)</Label>
+            <Input
+              id="imageUrl"
+              type="url"
+              value={formData.imageUrl}
+              onChange={(e) => handleInputChange("imageUrl", e.target.value)}
+              placeholder="https://exemple.com/image.jpg"
             />
           </div>
 
@@ -299,15 +321,18 @@ export default function EventsPage() {
             />
           </div>
 
-          <div className="md:col-span-2 space-y-2">
-            <Label htmlFor="location">Lieu</Label>
-            <Input
-              id="location"
-              value={formData.location}
-              onChange={(e) => handleInputChange("location", e.target.value)}
-              placeholder="Lieu de l'événement"
-              required
-            />
+          <div className="space-y-2">
+            <Label htmlFor="status">Statut</Label>
+            <select
+              id="status"
+              value={formData.status}
+              onChange={(e) => handleInputChange("status", e.target.value)}
+              className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm"
+            >
+              <option value="En cours">En cours</option>
+              <option value="Terminé">Terminé</option>
+              <option value="Annulé">Annulé</option>
+            </select>
           </div>
 
           <div className="md:col-span-2 space-y-2">
@@ -320,17 +345,6 @@ export default function EventsPage() {
               placeholder="Description de l'événement"
             />
           </div>
-
-          <div className="md:col-span-2 flex items-center space-x-2">
-            <input
-              type="checkbox"
-              id="isActive"
-              checked={formData.isActive}
-              onChange={(e) => handleInputChange("isActive", e.target.checked)}
-              className="rounded border-gray-300"
-            />
-            <Label htmlFor="isActive">Événement actif</Label>
-          </div>
         </div>
       </FormModal>
 
@@ -341,7 +355,7 @@ export default function EventsPage() {
             <DialogTitle>Confirmer la suppression</DialogTitle>
           </DialogHeader>
           <p>
-            Êtes-vous sûr de vouloir supprimer l&apos;événement &quot;{eventToDelete?.title}&quot; ?
+            Êtes-vous sûr de vouloir supprimer l&apos;événement &quot;{eventToDelete?.name}&quot; ?
             Cette action est irréversible.
           </p>
           <DialogFooter>

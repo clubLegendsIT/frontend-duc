@@ -1,17 +1,38 @@
 import api from '@/lib/api';
 
+export interface ItemVariant {
+  id?: string;
+  variantName: string;
+  price: number;
+  sku?: string;
+}
+
+export interface ItemImage {
+  id?: string;
+  imageUrl: string;
+  isDefault: boolean;
+}
+
+export interface ItemOption {
+  id?: string;
+  optionName: string;
+  optionValue: string;
+  optionType?: string;
+}
+
 export interface ItemData {
   id?: string;
   name: string;
-  description: string;
-  price: number;
+  description?: string;
+  status: string;
   categoryId: string;
   category?: {
     id: string;
     name: string;
   };
-  isAvailable: boolean;
-  imageUrl?: string;
+  variants: ItemVariant[];
+  images: ItemImage[];
+  options: ItemOption[];
   createdAt?: string;
   updatedAt?: string;
 }
@@ -32,7 +53,7 @@ export const itemsService = {
     return response.data;
   },
 
-  async update(id: string, data: Partial<ItemData>) {
+  async update(id: string, data: Omit<ItemData, 'id' | 'category' | 'createdAt' | 'updatedAt'>) {
     const response = await api.patch(`/items/${id}`, data);
     return response.data;
   },
