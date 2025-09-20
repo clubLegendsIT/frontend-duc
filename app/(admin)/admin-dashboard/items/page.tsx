@@ -179,18 +179,29 @@ export default function ItemsPage() {
 
       const payload = {
         name: formData.name,
-        description: formData.description,
+        description: formData.description || undefined,
         categoryId: formData.categoryId,
         status: formData.status,
         variants: formData.variants
           .filter(v => v.variantName && v.price > 0)
-          .map(({ id, ...variant }) => variant),
+          .map(variant => ({
+            variantName: variant.variantName,
+            price: variant.price,
+            sku: variant.sku || undefined
+          })),
         images: processedImages
           .filter(img => img.imageUrl)
-          .map(({ id, file, ...image }) => image),
+          .map(image => ({
+            imageUrl: image.imageUrl,
+            isDefault: image.isDefault
+          })),
         options: formData.options
           .filter(opt => opt.optionName && opt.optionValue)
-          .map(({ id, ...option }) => option),
+          .map(option => ({
+            optionName: option.optionName,
+            optionValue: option.optionValue,
+            optionType: option.optionType || "addon"
+          })),
       };
 
       if (editingItem) {
@@ -483,7 +494,7 @@ export default function ItemsPage() {
               <Label htmlFor="categoryId">Catégorie</Label>
               <select
                 id="categoryId"
-                value={formData.categoryId}
+                value={formData.categoryId || ""}
                 onChange={(e) => handleInputChange("categoryId", e.target.value)}
                 className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm"
                 required

@@ -25,7 +25,9 @@ interface Category {
   displayOrder: number;
   parentId?: string;
   parent?: Category;
-  itemCount?: number;
+  _count?: {
+    items: number;
+  };
   createdAt: string;
   updatedAt: string;
 }
@@ -206,12 +208,12 @@ export default function CategoriesPage() {
       ),
     },
     {
-      key: 'itemCount' as keyof Category,
+      key: '_count' as keyof Category,
       header: 'Articles',
       render: (value: unknown, item: Category) => (
         <div className="flex items-center space-x-2">
           <Hash className="h-4 w-4 text-gray-500" />
-          <span>{typeof value === "number" ? value : 0} articles</span>
+          <span>{item._count?.items || 0} articles</span>
         </div>
       ),
     },
@@ -350,10 +352,10 @@ export default function CategoriesPage() {
             <p>
               Êtes-vous sûr de vouloir supprimer la catégorie &quot;{categoryToDelete?.name}&quot; ?
             </p>
-            {categoryToDelete?.itemCount && categoryToDelete.itemCount > 0 && (
+            {categoryToDelete?._count?.items && categoryToDelete._count.items > 0 && (
               <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                 <p className="text-sm text-yellow-800">
-                  ⚠️ Cette catégorie contient {categoryToDelete.itemCount} article(s). 
+                  ⚠️ Cette catégorie contient {categoryToDelete._count.items} article(s). 
                   La suppression affectera ces articles.
                 </p>
               </div>
