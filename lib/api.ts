@@ -1,9 +1,9 @@
 import axios from "axios";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+const API_BASE_URL = process.env.NODE_ENV === 'production' ? "" : (process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001")
 
 const api = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: `${API_BASE_URL}/api`,
 });
 
 let isRefreshing = false;
@@ -54,7 +54,7 @@ api.interceptors.response.use(
           throw new Error('No refresh token');
         }
 
-        const response = await axios.post(`${API_BASE_URL}/auth/refresh`, {
+        const response = await axios.post(`${API_BASE_URL}/api/auth/refresh`, {
           refresh_token: refreshToken
         });
 
