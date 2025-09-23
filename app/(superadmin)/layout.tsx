@@ -1,6 +1,6 @@
 import RoleProtectedRoute from "@/components/RoleProtectedRoute";
-import Navbar from "@/components/Navbar";
-import MobileBottomNav from "@/components/MobileBottomNav";
+import Navbar from "@/components/Admin-Navbare/Navbar";
+import MobileBottomNav from "@/components/Admin-Navbare/MobileBottomNav";
 
 export default function SuperAdminLayout({
   children,
