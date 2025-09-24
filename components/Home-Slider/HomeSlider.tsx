@@ -90,11 +90,11 @@ const HomeSlider = () => {
 
         {/* Slide 3: Notre Carte */}
         <SwiperSlide className="relative">
-          <img
+        <img
             src="/patte.png"
             alt="Pâte à pizzas faite maison"
-            className="absolute inset-0 w-full h-full object-cover"
-          />
+            className="absolute inset-0 w-full h-full object-cover object-bottom"
+        />
           <div className="absolute inset-0 bg-black/50" />
           <div className="relative z-10 flex items-center justify-center h-full">
             <div className="text-center p-4 max-w-lg">

@@ -21,6 +21,7 @@ interface Event {
   id: string;
   name: string;
   description: string;
+  eventType: string;
   imageUrl?: string;
   startDate: string;
   endDate: string;
@@ -36,6 +37,7 @@ interface EventFormData {
   startDate: string;
   endDate: string;
   status: string;
+  eventType: string;
 }
 
 export default function EventsPage() {
@@ -53,6 +55,7 @@ export default function EventsPage() {
     startDate: "",
     endDate: "",
     status: "En cours",
+    eventType: "",
   });
 
   const { toast } = useToast();
@@ -85,6 +88,7 @@ export default function EventsPage() {
       startDate: "",
       endDate: "",
       status: "En cours",
+      eventType: "",
     });
     setIsModalOpen(true);
   };
@@ -98,6 +102,7 @@ export default function EventsPage() {
       startDate: event.startDate ? event.startDate.split('T')[0] : "", // Format for date input
       endDate: event.endDate ? event.endDate.split('T')[0] : "",
       status: event.status,
+      eventType: event.eventType,
     });
     setIsModalOpen(true);
   };
@@ -197,6 +202,15 @@ export default function EventsPage() {
         </div>
       ),
     },
+    {
+      key: 'eventType' as keyof Event,
+      header: 'Type',
+      render: (value: unknown, item: Event) => (
+        <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+          {item.eventType}
+        </span>
+      ),
+    },  
     {
       key: 'startDate' as keyof Event,
       header: 'Date de début',
@@ -333,6 +347,17 @@ export default function EventsPage() {
               <option value="Terminé">Terminé</option>
               <option value="Annulé">Annulé</option>
             </select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="eventType">Type d'événement</Label>
+            <Input
+              id="eventType"
+              value={formData.eventType}
+              onChange={(e) => handleInputChange("eventType", e.target.value)}
+              placeholder="Type d'événement"
+              required
+            />
           </div>
 
           <div className="md:col-span-2 space-y-2">

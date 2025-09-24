@@ -695,9 +695,9 @@ export default function ItemsPage() {
                       onChange={(e) => updateOption(index, "optionType", e.target.value)}
                       className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm"
                     >
-                      <option value="addon">Complément</option>
-                      <option value="modifier">Modificateur</option>
-                      <option value="choice">Choix</option>
+                      <option value="addon">allergene</option>
+                      <option value="modifier">vegetable</option>
+                      <option value="choice">base</option>
                     </select>
                   </div>
                   <div className="flex items-end">

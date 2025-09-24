@@ -2,12 +2,13 @@ import api from '@/lib/api';
 
 export interface EventData {
   id?: string;
-  title: string;
+  name: string;
   description: string;
-  startDate: string;
-  endDate: string;
-  location: string;
-  isActive: boolean;
+  startDate?: string;
+  endDate?: string;
+  status: string;
+  eventType: string;
+  imageUrl?: string;
   createdAt?: string;
   updatedAt?: string;
 }
