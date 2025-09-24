@@ -179,7 +179,7 @@ export default function EventsPage() {
       month: 'short',
       day: 'numeric',
     });
-  };
+  }; 
 
   const columns = [
     {
