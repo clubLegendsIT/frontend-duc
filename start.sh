@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Set default values for backend connection
-export BACKEND_HOST=${BACKEND_HOST:-pizzaleduc-be.railway.internal}
+export BACKEND_HOST=${BACKEND_HOST:-duc-backend.railway.internal}
 export BACKEND_PORT=${BACKEND_PORT:-8080}
 
 echo "=== Railway Deployment Start Script ==="
