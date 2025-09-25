@@ -19,6 +19,11 @@ export const eventsService = {
     return response.data;
   },
 
+  async getAllHeader() {
+    const response = await api.get('/events/header');
+    return response.data;
+  },
+
   async getById(id: string) {
     const response = await api.get(`/events/${id}`);
     return response.data;
